@@ -1,0 +1,11 @@
+node_modules/
+client/node_modules/
+clients.db
+*.env
+.env
+client/build/
+dist/
+.DS_Store
+package-lock.json
+/.vscode
+coverage/
