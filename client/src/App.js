@@ -18,7 +18,7 @@ function triggerDriveUpload() {
 const INSURANCE_TYPES = {
   'Motor - Vehicle': ['Comprehensive', 'TPO (Third Party Only)'],
   'Commercial Vehicle': ['Commercial Van', 'Commercial Truck', 'Commercial Vehicle'],
-  'Private Cars': ['Private Sedan', 'Private SUV', 'Private Hatchback'],
+  'Private Cars': ['Private Car'],
   'PSV/Uber/Taxi': ['Uber', 'Taxi', 'Matatu', 'PSV', 'PSV Bus'],
   'Motorcycle': ['Private Motorcycle', 'Commercial Motorcycle'],
   'TukTuk': ['TukTuk'],
