@@ -304,13 +304,15 @@ function ClientManagementPage() {
       alert('Client name is required');
       return;
     }
-    // validate phone: required and 10 digits
-    if (!newClientForm.phone || !/^\d{10}$/.test(newClientForm.phone.trim())) {
+    // sanitize phone: strip any non-digit characters then validate (accepts formatted input)
+    const phoneDigits = (newClientForm.phone || '').toString().replace(/\D/g, '').trim();
+    if (!phoneDigits || phoneDigits.length !== 10) {
       alert('Phone number is required and must be 10 digits');
       return;
     }
     try {
-      const response = await axios.post('/api/clients', newClientForm);
+      const payload = { ...newClientForm, phone: phoneDigits };
+      const response = await axios.post('/api/clients', payload);
       setNewClientForm({ name: '', email: '', phone: '', customerIdNo: '', vehicleNumberPlate: '', insuranceCategory: '', insuranceType: '', businessType: '', startDate: '', expiryDate: '', company: '', premium: '', premiumPaid: '' });
       fetchClients();
       setSelectedClient(response.data);
@@ -328,13 +330,15 @@ function ClientManagementPage() {
       alert('Client name is required');
       return;
     }
-    // validate phone on update
-    if (!editingClient.phone || !/^\d{10}$/.test(String(editingClient.phone).trim())) {
+    // sanitize phone on update: strip non-digits and validate
+    const phoneDigits = String(editingClient.phone || '').replace(/\D/g, '').trim();
+    if (!phoneDigits || phoneDigits.length !== 10) {
       alert('Phone number is required and must be 10 digits');
       return;
     }
     try {
-      await axios.put(`/api/clients/${editingClient.id}`, editingClient);
+      const payload = { ...editingClient, phone: phoneDigits };
+      await axios.put(`/api/clients/${editingClient.id}`, payload);
       fetchClients();
       fetchClientDetail(editingClient.id);
       triggerDriveUpload();

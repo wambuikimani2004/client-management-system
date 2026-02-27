@@ -117,17 +117,27 @@ const allQuery = (sql, params = []) => {
 
 // Load environment variables for OAuth credentials (create .env with values)
 require('dotenv').config();
-const {google} = require('googleapis');
+
+// Lazy-load googleapis (optional). If not installed, Drive features become no-ops
+function tryLoadGoogleApis() {
+  try {
+    return require('googleapis');
+  } catch (err) {
+    return null;
+  }
+}
 
 const OAUTH_SCOPES = ['https://www.googleapis.com/auth/drive.file'];
 const TOKENS_PATH = path.join(__dirname, 'drive_tokens.json');
 
 function getOAuthClient() {
+  const googleApis = tryLoadGoogleApis();
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
   const redirectUri = process.env.GOOGLE_REDIRECT_URI || (process.env.APP_URL ? `${process.env.APP_URL}/auth/google/callback` : 'http://localhost:5000/auth/google/callback');
+  if (!googleApis) return null;
   if (!clientId || !clientSecret) return null;
-  return new google.auth.OAuth2(clientId, clientSecret, redirectUri);
+  return new googleApis.google.auth.OAuth2(clientId, clientSecret, redirectUri);
 }
 
 function saveTokens(tokens) {
