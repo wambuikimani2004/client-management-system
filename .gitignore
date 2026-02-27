@@ -1,6 +1,5 @@
 node_modules/
 client/node_modules/
-clients.db
 *.env
 .env
 client/build/
