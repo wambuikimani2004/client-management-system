@@ -242,21 +242,6 @@ function ClientManagementPage() {
     fetchClients();
   }, []);
 
-  // --- Claims page: helper to select top match on Enter in claims search ---
-   {
-    const q = qInput.trim().toLowerCase();
-    const filtered = clients.filter(c => {
-      const name = (c.name || '').toLowerCase();
-      const phone = String(c.phone || '').toLowerCase();
-      return (q === '' || name.includes(q) || phone.includes(q));
-    });
-    if (filtered.length > 0) {
-      const first = filtered[0];
-      setSearchQuery(isNumericQuery(q) ? (first.phone || first.name) : (first.name));
-      localFetchClientDetail(first.id);
-    }
-  };
-
   useEffect(() => {
     // whenever search query changes, scroll clients list to top so top match is visible
     if (clientsListRef.current) clientsListRef.current.scrollTop = 0;
