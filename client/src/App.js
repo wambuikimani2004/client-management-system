@@ -243,7 +243,7 @@ function ClientManagementPage() {
   }, []);
 
   // --- Claims page: helper to select top match on Enter in claims search ---
-  const handleClaimsSearchEnter = (qInput, localFetchClientDetail) => {
+   {
     const q = qInput.trim().toLowerCase();
     const filtered = clients.filter(c => {
       const name = (c.name || '').toLowerCase();
