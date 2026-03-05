@@ -63,7 +63,7 @@ A full-stack web application for managing insurance client records and claims tr
 
 - **Backend**: Node.js with Express.js
 - **Frontend**: React
-- **Database**: SQLite3
+- **Database**: Postgresql
 - **HTTP Client**: Axios
 
 ## Installation
@@ -117,7 +117,7 @@ The app will be available at `http://localhost:3000` and the API at `http://loca
 ## Database Schema
 
 ### Clients Table
-- `id` - Unique identifier
+- `id` - clientid number
 - `name` - Client name
 - `email` - Email address
 - `phone` - Phone number
@@ -128,7 +128,7 @@ The app will be available at `http://localhost:3000` and the API at `http://loca
 - `createdAt` - Creation timestamp
 
 ### Records Table (Claims)
-- `id` - Unique identifier
+- `id` - clientid number
 - `clientId` - Reference to client
 - `claimNumber` - Claim number
 - `claimAmount` - Claim amount in dollars
@@ -151,9 +151,7 @@ The system supports the following insurance categories and types:
 - Commercial Vehicle
 
 ### 3. Private Cars
-- Private Sedan
-- Private SUV
-- Private Hatchback
+- Private car
 
 ### 4. PSV/Uber/Taxi
 - Uber
@@ -196,7 +194,7 @@ The system supports the following insurance categories and types:
 ```
 client-management-app/
 ├── server.js                 # Express backend server
-├── clients.db               # SQLite database (auto-created)
+├── clients.db               # Postgresql database (auto-created)
 ├── package.json             # Main app dependencies
 ├── client/
 │   ├── package.json         # React app dependencies
