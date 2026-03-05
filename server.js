@@ -3,17 +3,21 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
-const {pool}= require('pg');
+const { Pool } = require('pg');
+require('dotenv').config();
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/client_management_db',
   ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+
 // Serve static files from build folder if it exists (production)
 const buildPath = path.join(__dirname, 'client/build');
 if (fs.existsSync(buildPath)) {
@@ -25,69 +29,65 @@ const ADMIN_USERNAME = 'ABIJAY';
 const ADMIN_PASSWORD = 'ABIJAY2026#';
 
 // Create tables if they don't exist
-db.serialize(() => {
-  db.run(`
-    CREATE TABLE IF NOT EXISTS clients (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      email TEXT,
-      phone TEXT,
-      customerIdNo TEXT,
-      vehicleNumberPlate TEXT,
-      company TEXT,
-      premiumPaid REAL,
-      insuranceCategory TEXT,
-      insuranceType TEXT,
-      businessType TEXT,
-      startDate DATE,
-      expiryDate DATE,
-      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+// Create tables if they don't exist
+(async () => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS clients (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT,
+        phone TEXT,
+        customerIdNo TEXT,
+        vehicleNumberPlate TEXT,
+        company TEXT,
+        premium REAL,
+        premiumPaid REAL,
+        insuranceCategory TEXT,
+        insuranceType TEXT,
+        businessType TEXT,
+        startDate DATE,
+        expiryDate DATE,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
 
-  db.run(`
-    CREATE TABLE IF NOT EXISTS records (
-      id TEXT PRIMARY KEY,
-      clientId TEXT NOT NULL,
-      claimNumber TEXT NOT NULL,
-      claimAmount REAL,
-      claimDate DATE,
-      status TEXT DEFAULT 'Pending',
-      recordType TEXT,
-      description TEXT,
-      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY(clientId) REFERENCES clients(id) ON DELETE CASCADE
-    )
-  `);
-});
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS records (
+        id TEXT PRIMARY KEY,
+        clientId TEXT NOT NULL,
+        claimNumber TEXT NOT NULL,
+        claimAmount REAL,
+        claimDate DATE,
+        status TEXT DEFAULT 'Pending',
+        recordType TEXT,
+        description TEXT,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(clientId) REFERENCES clients(id) ON DELETE CASCADE
+      )
+    `);
+
+    console.log('Tables ready');
+  } catch (err) {
+    console.error('Database setup error:', err);
+  }
+})();
 
 
-// Helper function to run queries with promises
-const runQuery = (sql, params = []) => {
-  return new Promise((resolve, reject) => {
-    db.run(sql, params, function(err) {
-      if (err) reject(err);
-      else resolve(this);
-    });
-  });
+// PostgreSQL query helpers
+const runQuery = async (sql, params = []) => {
+  const result = await pool.query(sql, params);
+  return result.rows;
 };
 
-const getQuery = (sql, params = []) => {
-  return new Promise((resolve, reject) => {
-    db.get(sql, params, (err, row) => {
-      if (err) reject(err);
-      else resolve(row);
-    });
-  });
+const getQuery = async (sql, params = []) => {
+  const result = await pool.query(sql, params);
+  return result.rows[0];
 };
 
-const allQuery = (sql, params = []) => {
-  return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
-      if (err) reject(err);
-      else resolve(rows);
-    });
-  });
+const allQuery = async (sql, params = []) => {
+  const result = await pool.query(sql, params);
+  return result.rows;
 };
 
 // Run simple migrations to add any missing columns to existing DB tables
