@@ -381,85 +381,114 @@ app.get('/api/clients/:id', async (req, res) => {
 app.post('/api/clients', async (req, res) => {
   try {
     const { name, email, phone, customerIdNo, vehicleNumberPlate, company, premium, premiumPaid, insuranceCategory, insuranceType, businessType, startDate, expiryDate } = req.body;
+
     if (!name) {
       return res.status(400).json({ error: 'Name is required' });
     }
-    // normalize phone to string so numeric values from the client don't fail typeof checks
+
     const phoneStr = phone != null ? String(phone) : '';
+
     if (!/^\d{10}$/.test(phoneStr.trim())) {
       return res.status(400).json({ error: 'Phone number is required and must be 10 digits' });
     }
+
     const id = uuidv4();
+
     await runQuery(
-      'INSERT INTO clients (id, name, email, phone, customerIdNo, vehicleNumberPlate, company, premium, premiumPaid, insuranceCategory, insuranceType, businessType, startDate, expiryDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO clients (id, name, email, phone, customerIdNo, vehicleNumberPlate, company, premium, premiumPaid, insuranceCategory, insuranceType, businessType, startDate, expiryDate) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)',
       [id, name, email || '', phoneStr || '', customerIdNo || '', vehicleNumberPlate || '', company || '', premium || 0, premiumPaid || 0, insuranceCategory || '', insuranceType || '', businessType || '', startDate || '', expiryDate || '']
     );
+
     res.json({ id, name, email, phone: phoneStr, customerIdNo, vehicleNumberPlate, company, premium: premium || 0, premiumPaid: premiumPaid || 0, insuranceCategory, insuranceType, businessType, startDate, expiryDate });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // Update client
 app.put('/api/clients/:id', async (req, res) => {
   try {
+
     const { name, email, phone, customerIdNo, vehicleNumberPlate, company, premium, premiumPaid, insuranceCategory, insuranceType, businessType, startDate, expiryDate } = req.body;
-    // normalize phone to string to accept numeric phone values from clients
+
     const phoneStr = phone != null ? String(phone) : '';
+
     if (!/^\d{10}$/.test(phoneStr.trim())) {
       return res.status(400).json({ error: 'Phone number is required and must be 10 digits' });
     }
+
     await runQuery(
-      'UPDATE clients SET name = ?, email = ?, phone = ?, customerIdNo = ?, vehicleNumberPlate = ?, company = ?, premium = ?, premiumPaid = ?, insuranceCategory = ?, insuranceType = ?, businessType = ?, startDate = ?, expiryDate = ? WHERE id = ?',
+      'UPDATE clients SET name=$1, email=$2, phone=$3, customerIdNo=$4, vehicleNumberPlate=$5, company=$6, premium=$7, premiumPaid=$8, insuranceCategory=$9, insuranceType=$10, businessType=$11, startDate=$12, expiryDate=$13 WHERE id=$14',
       [name, email || '', phoneStr || '', customerIdNo || '', vehicleNumberPlate || '', company || '', premium || 0, premiumPaid || 0, insuranceCategory || '', insuranceType || '', businessType || '', startDate || '', expiryDate || '', req.params.id]
     );
+
     res.json({ id: req.params.id, name, email, phone: phoneStr, customerIdNo, vehicleNumberPlate, company, premium: premium || 0, premiumPaid: premiumPaid || 0, insuranceCategory, insuranceType, businessType, startDate, expiryDate });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // Delete client
 app.delete('/api/clients/:id', async (req, res) => {
   try {
-    await runQuery('DELETE FROM clients WHERE id = ?', [req.params.id]);
+
+    await runQuery('DELETE FROM clients WHERE id = $1', [req.params.id]);
+
     res.json({ message: 'Client deleted' });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // Add claim for client
 app.post('/api/clients/:clientId/records', async (req, res) => {
   try {
+
     const { claimNumber, claimAmount, claimDate, status, description, recordType } = req.body;
+
     if (!claimNumber) {
       return res.status(400).json({ error: 'Claim number is required' });
     }
+
     if (!recordType) {
       return res.status(400).json({ error: 'Record type is required' });
     }
+
     const id = uuidv4();
     const currentDate = new Date().toISOString().split('T')[0];
+
     await runQuery(
-      'INSERT INTO records (id, clientId, claimNumber, claimAmount, claimDate, status, recordType, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO records (id, clientId, claimNumber, claimAmount, claimDate, status, recordType, description) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)',
       [id, req.params.clientId, claimNumber, claimAmount || 0, claimDate || currentDate, status || 'Pending', recordType || '', description || '']
     );
+
     res.json({ id, clientId: req.params.clientId, claimNumber, claimAmount, claimDate: claimDate || currentDate, status: status || 'Pending', recordType, description });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
+
 // Delete record
 app.delete('/api/records/:id', async (req, res) => {
   try {
-    await runQuery('DELETE FROM records WHERE id = ?', [req.params.id]);
+
+    await runQuery('DELETE FROM records WHERE id = $1', [req.params.id]);
+
     res.json({ message: 'Record deleted' });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // Serve React app (production only)
 if (fs.existsSync(buildPath)) {
