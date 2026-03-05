@@ -3,9 +3,11 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
-const sqlite3 = require('sqlite3').verbose();
-const { v4: uuidv4 } = require('uuid');
-
+const {pool}= require('pg');
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/client_management_db',
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
+});
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -21,12 +23,6 @@ if (fs.existsSync(buildPath)) {
 // Admin credentials
 const ADMIN_USERNAME = 'ABIJAY';
 const ADMIN_PASSWORD = 'ABIJAY2026#';
-
-// Initialize SQLite Database
-const db = new sqlite3.Database('./clients.db', (err) => {
-  if (err) console.error(err.message);
-  else console.log('Connected to SQLite database');
-});
 
 // Create tables if they don't exist
 db.serialize(() => {
