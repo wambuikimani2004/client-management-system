@@ -14,10 +14,10 @@ require('dotenv').config();
 // Database Setup
 // -----------------------------
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 
-    'postgresql://postgres:password@localhost:5432/client_management_db',
-  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false } // REQUIRED on Render
 });
+
 
 // -----------------------------
 // Express App Setup
