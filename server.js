@@ -29,7 +29,6 @@ const ADMIN_USERNAME = 'ABIJAY';
 const ADMIN_PASSWORD = 'ABIJAY2026#';
 
 // Create tables if they don't exist
-// Create tables if they don't exist
 (async () => {
   try {
     await pool.query(`
