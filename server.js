@@ -92,7 +92,7 @@ const allQuery = async (sql, params = []) => {
       )
     `);
     console.log('Tables ready');
-  } catch (err) { console.error('Database setup error:', err); }
+  } catch (err) { console.error('Database setup error:', err.message); }
 })();
 
 // -----------------------------
