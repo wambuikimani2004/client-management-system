@@ -86,93 +86,126 @@ function LoginPage({ onLoginSuccess }) {
   );
 }
 
-// Insurance Expiry Dashboard Component
+//import React, { useState, useEffect } from "react";
+import axios from "axios";
+
 function InsuranceExpiryDashboard() {
   const [expiryData, setExpiryData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all'); // all, expiring_soon
+  const [filter, setFilter] = useState("all"); // all, expiring_soon
 
   useEffect(() => {
     fetchExpiryData();
-    // Refresh every hour to update days remaining
+
+    // Refresh every hour
     const interval = setInterval(fetchExpiryData, 3600000);
+
     return () => clearInterval(interval);
   }, []);
 
   const fetchExpiryData = async () => {
     try {
-      const response = await axios.get('/api/insurance-expiry');
-      setExpiryData(response.data);
+      const response = await axios.get("/api/insurance-expiry");
+
+      // 🔴 Remove items expired more than 2 days ago
+      const cleanedData = response.data.filter(
+        (item) => item.daysRemaining >= -2
+      );
+
+      setExpiryData(cleanedData);
     } catch (error) {
-      console.error('Error fetching expiry data:', error);
+      console.error("Error fetching expiry data:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const getFilteredData = () => {
-    switch(filter) {
-      case 'expiring_soon':
-        return expiryData.filter(item => item.isExpiringSoon && !item.isExpired).sort((a, b) => a.daysRemaining - b.daysRemaining);
+    const sorted = [...expiryData].sort(
+      (a, b) => a.daysRemaining - b.daysRemaining
+    );
+
+    switch (filter) {
+      case "expiring_soon":
+        return sorted.filter(
+          (item) => item.isExpiringSoon && !item.isExpired
+        );
       default:
-        return expiryData.sort((a, b) => a.daysRemaining - b.daysRemaining);
+        return sorted;
     }
   };
 
   const getStatusColor = (item) => {
     if (item.isExpired) {
-      return { bg: '#f8d7da', text: '#721c24', status: '❌ EXPIRED' };
-      } else if (item.isExpiringSoon) {
-        return { bg: '#fdecea', text: '#e74c3c', status: '⚠️ EXPIRING SOON' };
+      return { bg: "#f8d7da", text: "#721c24", status: "❌ EXPIRED" };
+    } else if (item.isExpiringSoon) {
+      return { bg: "#fdecea", text: "#e74c3c", status: "⚠️ EXPIRING SOON" };
     } else {
-      return { bg: '#d4edda', text: '#155724', status: '✅ VALID' };
+      return { bg: "#d4edda", text: "#155724", status: "✅ VALID" };
     }
   };
 
   const filteredData = getFilteredData();
 
+  const expiredCount = expiryData.filter((d) => d.isExpired).length;
+  const expiringSoonCount = expiryData.filter(
+    (d) => d.isExpiringSoon && !d.isExpired
+  ).length;
+
   return (
     <div>
       <div className="dashboard-section">
+
+        {/* STATS */}
         <div className="stats-boxes">
           <div className="stat-box">
-            <div className="stat-number">{expiryData.filter(d => d.isExpired).length}</div>
+            <div className="stat-number">{expiredCount}</div>
             <div className="stat-label">Expired</div>
           </div>
+
           <div className="stat-box warning">
-            <div className="stat-number">{expiryData.filter(d => d.isExpiringSoon && !d.isExpired).length}</div>
+            <div className="stat-number">{expiringSoonCount}</div>
             <div className="stat-label">Expiring Soon</div>
           </div>
+
           <div className="stat-box info">
             <div className="stat-number">{expiryData.length}</div>
             <div className="stat-label">Total Clients</div>
           </div>
         </div>
 
+        {/* FILTERS */}
         <div className="filter-section">
           <h3>Filter by Status:</h3>
+
           <div className="filter-buttons">
-            <button 
-              className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
-              onClick={() => setFilter('all')}
+            <button
+              className={`filter-btn ${filter === "all" ? "active" : ""}`}
+              onClick={() => setFilter("all")}
             >
               All ({expiryData.length})
             </button>
-            <button 
-              className={`filter-btn ${filter === 'expiring_soon' ? 'active' : ''}`}
-              onClick={() => setFilter('expiring_soon')}
+
+            <button
+              className={`filter-btn ${
+                filter === "expiring_soon" ? "active" : ""
+              }`}
+              onClick={() => setFilter("expiring_soon")}
             >
-              Expiring Soon ({expiryData.filter(d => d.isExpiringSoon && !d.isExpired).length})
+              Expiring Soon ({expiringSoonCount})
             </button>
           </div>
         </div>
       </div>
 
+      {/* TABLE */}
       <div className="expiry-list">
         {loading ? (
           <div className="loading">Loading insurance data...</div>
         ) : filteredData.length === 0 ? (
-          <div className="empty-state">No clients found for this filter.</div>
+          <div className="empty-state">
+            No clients found for this filter.
+          </div>
         ) : (
           <div className="expiry-table">
             <div className="expiry-header">
@@ -185,18 +218,50 @@ function InsuranceExpiryDashboard() {
               <div className="expiry-cell">Days Remaining</div>
               <div className="expiry-cell">Status</div>
             </div>
+
             {filteredData.map((item) => {
               const statusInfo = getStatusColor(item);
+
               return (
-                <div key={item.id} className={`expiry-row ${item.isExpired ? 'expired' : ''}`}> 
+                <div
+                  key={item.id}
+                  className={`expiry-row ${item.isExpired ? "expired" : ""}`}
+                  style={{ backgroundColor: statusInfo.bg }}
+                >
                   <div className="expiry-cell">{item.name}</div>
-                  <div className="expiry-cell">{item.vehicleNumberPlate || '—'}</div>
-                  <div className="expiry-cell">{item.company || '—'}</div>
-                  <div className="expiry-cell">{item.insuranceCategory || '—'}</div>
-                  <div className="expiry-cell">{item.insuranceType || '—'}</div>
-                  <div className="expiry-cell">{item.expiryDate || '—'}</div>
-                  <div className="expiry-cell">{item.isExpired ? `${Math.abs(item.daysRemaining)} days overdue` : `${item.daysRemaining} days`}</div>
-                  <div className="expiry-cell" style={{color: statusInfo.text}}>{statusInfo.status}</div>
+
+                  <div className="expiry-cell">
+                    {item.vehicleNumberPlate || "—"}
+                  </div>
+
+                  <div className="expiry-cell">
+                    {item.company || "—"}
+                  </div>
+
+                  <div className="expiry-cell">
+                    {item.insuranceCategory || "—"}
+                  </div>
+
+                  <div className="expiry-cell">
+                    {item.insuranceType || "—"}
+                  </div>
+
+                  <div className="expiry-cell">
+                    {item.expiryDate || "—"}
+                  </div>
+
+                  <div className="expiry-cell">
+                    {item.isExpired
+                      ? `${Math.abs(item.daysRemaining)} days overdue`
+                      : `${item.daysRemaining} days`}
+                  </div>
+
+                  <div
+                    className="expiry-cell"
+                    style={{ color: statusInfo.text, fontWeight: "bold" }}
+                  >
+                    {statusInfo.status}
+                  </div>
                 </div>
               );
             })}
@@ -206,6 +271,8 @@ function InsuranceExpiryDashboard() {
     </div>
   );
 }
+
+export default InsuranceExpiryDashboard;
 
 // Client Management Component
 function ClientManagementPage() {
