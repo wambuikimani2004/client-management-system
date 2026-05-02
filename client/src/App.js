@@ -87,7 +87,6 @@ function LoginPage({ onLoginSuccess }) {
 }
 
 //import React, { useState, useEffect } from "react";
-import axios from "axios";
 
 function InsuranceExpiryDashboard() {
   const [expiryData, setExpiryData] = useState([]);
@@ -272,7 +271,7 @@ function InsuranceExpiryDashboard() {
   );
 }
 
-export default InsuranceExpiryDashboard;
+// (component exported as default at the bottom as `App`)
 
 // Client Management Component
 function ClientManagementPage() {
