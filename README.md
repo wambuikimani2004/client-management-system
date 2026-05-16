@@ -209,3 +209,24 @@ client-management-app/
 ## License
 
 ISC
+
+## Docker
+
+Run the app locally with Docker and Docker Compose:
+
+1. Build and start services (Postgres, backend, frontend):
+
+```bash
+docker compose up --build
+```
+
+2. Open frontend at `http://localhost:3000` and API at `http://localhost:5000`.
+
+Notes:
+- Backend reads `DATABASE_URL` from environment; docker-compose sets this to a local Postgres instance.
+- The Compose file persists Postgres data in a Docker volume named `db_data`.
+
+CI/CD (GitHub Actions):
+- A workflow is added at `.github/workflows/docker-publish.yml` that builds and pushes images to Docker Hub.
+- Configure repository secrets `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` for publishing.
+
