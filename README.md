@@ -1,6 +1,7 @@
 # Abijay Client Management App
 
 Simple insurance client management system with:
+
 - Client CRUD and claims/records
 - Insurance expiry dashboard (days remaining)
 - Admin login (USERNAME: ABIJAY, PASSWORD: ABIJAY2026#)
@@ -16,14 +17,14 @@ cd client
 npm install
 ```
 
-2. Run the server and client (development):
+1. Run the server and client (development):
 
 ```bash
 # from project root
 npm run dev
 ```
 
-3. Open the frontend at `http://localhost:3000`.
+1. Open the frontend at `http://localhost:3000`.
 
 ## Environment
 
@@ -34,12 +35,14 @@ npm run dev
 Recommended: Frontend on Vercel, Backend on Render (or Railway).
 
 Frontend (Vercel):
+
 - Root directory: `client`
 - Build command: `npm run build`
 - Output directory: `build`
 - Set `REACT_APP_API_URL` to the backend URL
 
 Backend (Render):
+
 - Connect repo, build command: `npm install`, start command: `npm start`
 
 ## Admin credentials
@@ -48,7 +51,10 @@ Backend (Render):
 - Password: `ABIJAY2026#`
 
 ## Notes
-- The app uses an SQLite file `clients.db`. For production consider using a managed DB or ensure your host persists files.# Insurance Client Management System
+
+- The app uses an SQLite file `clients.db`. For production consider using a managed DB or ensure your host persists files.
+
+## Insurance Client Management System
 
 A full-stack web application for managing insurance client records and claims tracking.
 
@@ -69,17 +75,20 @@ A full-stack web application for managing insurance client records and claims tr
 ## Installation
 
 ### Prerequisites
+
 - Node.js (v14+)
 - npm
 
 ### Setup
 
 1. Navigate to the project directory:
+
 ```bash
 cd client-management-app
 ```
 
-2. Install all dependencies:
+1. Install all dependencies:
+
 ```bash
 npm run install-all
 ```
@@ -104,6 +113,7 @@ The app will be available at `http://localhost:3000` and the API at `http://loca
 ## API Endpoints
 
 ### Clients
+
 - `GET /api/clients` - Get all clients
 - `GET /api/clients/:id` - Get client with all claims
 - `POST /api/clients` - Add new client
@@ -111,12 +121,14 @@ The app will be available at `http://localhost:3000` and the API at `http://loca
 - `DELETE /api/clients/:id` - Delete client
 
 ### Claims
+
 - `POST /api/clients/:clientId/records` - Add claim for client
 - `DELETE /api/records/:id` - Delete claim
 
 ## Database Schema
 
 ### Clients Table
+
 - `id` - clientid number
 - `name` - Client name
 - `email` - Email address
@@ -128,6 +140,7 @@ The app will be available at `http://localhost:3000` and the API at `http://loca
 - `createdAt` - Creation timestamp
 
 ### Records Table (Claims)
+
 - `id` - clientid number
 - `clientId` - Reference to client
 - `claimNumber` - Claim number
@@ -142,18 +155,22 @@ The app will be available at `http://localhost:3000` and the API at `http://loca
 The system supports the following insurance categories and types:
 
 ### 1. Motor - Vehicle
+
 - Comprehensive
 - TPO (Third Party Only)
 
 ### 2. Commercial Vehicle
+
 - Commercial Van
 - Commercial Truck
 - Commercial Vehicle
 
 ### 3. Private Cars
+
 - Private car
 
 ### 4. PSV/Uber/Taxi
+
 - Uber
 - Taxi
 - Matatu
@@ -161,19 +178,23 @@ The system supports the following insurance categories and types:
 - PSV Bus
 
 ### 5. Motorcycle
+
 - Private Motorcycle
 - Commercial Motorcycle
 
 ### 6. TukTuk
+
 - TukTuk
 
 ### 7. Non-Motor - Property
+
 - Fire
 - Theft
 - Burglary
 - Property Coverage
 
 ### 8. Personal Accident
+
 - Domestic PA
 - Student PA
 - Personal Accident
@@ -191,7 +212,7 @@ The system supports the following insurance categories and types:
 
 ## File Structure
 
-```
+```text
 client-management-app/
 ├── server.js                 # Express backend server
 ├── clients.db               # Postgresql database (auto-created)
@@ -220,13 +241,14 @@ Run the app locally with Docker and Docker Compose:
 docker compose up --build
 ```
 
-2. Open frontend at `http://localhost:3000` and API at `http://localhost:5000`.
+1. Open frontend at `http://localhost:3000` and API at `http://localhost:5000`.
 
 Notes:
+
 - Backend reads `DATABASE_URL` from environment; docker-compose sets this to a local Postgres instance.
 - The Compose file persists Postgres data in a Docker volume named `db_data`.
 
 CI/CD (GitHub Actions):
+
 - A workflow is added at `.github/workflows/docker-publish.yml` that builds and pushes images to Docker Hub.
 - Configure repository secrets `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` for publishing.
-
