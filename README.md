@@ -52,7 +52,7 @@ Backend (Render):
 
 ## Notes
 
-- The app uses an SQLite file `clients.db`. For production consider using a managed DB or ensure your host persists files.
+- The app uses PostgreSQL for all data storage. Local development requires a Postgres instance (via Docker Compose). For production, use a managed database service like Render or Railway.
 
 ## Insurance Client Management System
 
@@ -78,6 +78,7 @@ A full-stack web application for managing insurance client records and claims tr
 
 - Node.js (v14+)
 - npm
+- PostgreSQL (or Docker/Docker Compose for containerized setup)
 
 ### Setup
 
@@ -215,10 +216,12 @@ The system supports the following insurance categories and types:
 ```text
 client-management-app/
 ├── server.js                 # Express backend server
-├── clients.db               # Postgresql database (auto-created)
+├── docker-compose.yml       # Docker configuration (Postgres + services)
+├── Dockerfile               # Backend container image
 ├── package.json             # Main app dependencies
 ├── client/
 │   ├── package.json         # React app dependencies
+│   ├── Dockerfile           # Frontend container image
 │   ├── public/
 │   │   └── index.html       # HTML template
 │   └── src/
