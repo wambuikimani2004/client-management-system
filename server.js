@@ -15,8 +15,10 @@ require('dotenv').config();
 // -----------------------------
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: false
+  // Use SSL only in production (Render / hosted DB). For local Postgres use no SSL.
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
+
 
 // -----------------------------
 // Express App Setup
