@@ -13,10 +13,13 @@ require('dotenv').config();
 // -----------------------------
 // Database Setup
 // -----------------------------
+const dbConnection = process.env.DATABASE_URL || '';
+const useSSLForRemoteDb = dbConnection && !dbConnection.includes('localhost') && !dbConnection.includes('127.0.0.1') && !dbConnection.includes('db:') && !dbConnection.includes('postgres:');
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  // Use SSL only in production (Render / hosted DB). For local Postgres use no SSL.
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  connectionString: dbConnection,
+  // Use SSL only for hosted PostgreSQL instances; local Docker/Postgres should stay plain TCP.
+  ssl: useSSLForRemoteDb ? { rejectUnauthorized: false } : false
 });
 
 
