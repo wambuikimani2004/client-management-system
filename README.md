@@ -26,6 +26,14 @@ npm run dev
 
 1. Open the frontend at `http://localhost:3000`.
 
+### Use another device on the same Wi-Fi
+
+1. On the computer running Docker, find its Wi-Fi IPv4 address with `ipconfig` (for example, `192.168.2.104`).
+2. From the other device, open `http://192.168.2.104:3000` using your actual address. Do not use `localhost`, because that points to the other device itself.
+3. Allow Docker Desktop or TCP port `3000` through Windows Defender Firewall on the Private network if the page does not load.
+
+The frontend proxies `/api` requests to the backend container, so the second device only needs access to port `3000`.
+
 ## Environment
 
 - `REACT_APP_API_URL` — set this in Vercel to your backend URL (e.g. `https://your-backend.onrender.com`).

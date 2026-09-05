@@ -371,7 +371,8 @@ function ClientManagementPage() {
       triggerDriveUpload();
     } catch (error) {
       console.error('Error adding client:', error);
-      alert('Error adding client');
+      const message = error.response?.data?.error || error.message || 'Unable to reach the server';
+      alert(`Error adding client: ${message}`);
     }
   };
 
